@@ -330,6 +330,22 @@ geesefs works with:
 * Azure Blob Storage (even though it's not S3)
 * Backblaze B2
 * Selectel S3
+* [IDrive e2](https://www.idrive.com/s3-storage-e2/s3-compatible-api)
+
+For IDrive e2, use `--endpoint https://s3.<region>.idrivee2.com` with
+`--region <region>` and `--list-type 2`. With GeeseFS v0.43.9 in `us-west-2`,
+`--no-detect` and `--http-timeout 60s`, a 24 MiB file written out of order
+uploaded successfully and passed a SHA-256 read-back check after renaming.
+
+Set `--http-timeout` high enough for an entire part to upload at your link
+speed. In a separate probe with a 96 MiB file, a 5 MiB part timed out at
+15 seconds. The [AWS SDK](https://github.com/aws/aws-sdk-go/blob/v1.55.8/service/s3/platform_handlers_go1.6.go#L11-L27)
+added `Expect: 100-continue` after signing the first request, then included
+`expect` in the signed headers on retry. IDrive e2 returned
+`403 SignatureDoesNotMatch`. The same part succeeded with a 60-second timeout.
+Direct requests for the same part sent `Expect: 100-continue` in all cases.
+IDrive e2 returned HTTP 200 when the signature excluded the header and HTTP
+403 when the signature included it.
 
 It should also work with any other S3 that implements multipart uploads and
 multipart server-side copy (UploadPartCopy).
