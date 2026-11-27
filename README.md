@@ -330,6 +330,13 @@ geesefs works with:
 * Azure Blob Storage (even though it's not S3)
 * Backblaze B2
 * Selectel S3
+* [IDrive e2](https://www.idrive.com/s3-storage-e2/) (tested with GeeseFS v0.43.9).
+  Use the regional HTTPS endpoint, its matching `--region`, and `--list-type 2`.
+  On a slow uplink, give multipart requests time to finish, for example with
+  `--http-timeout 60s`. In a controlled test, a 5 MiB part exceeded a 15-second
+  deadline and the SDK retry returned `403 SignatureDoesNotMatch`. The same part
+  succeeded in about 16 seconds with the longer deadline.
+  The [IDrive e2 diagnostic](test/idrive-e2-timeout.py) reproduces the check.
 * [IDrive e2](https://www.idrive.com/s3-storage-e2/s3-compatible-api)
 
 For IDrive e2, use `--endpoint https://s3.<region>.idrivee2.com` with
