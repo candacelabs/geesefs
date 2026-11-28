@@ -346,6 +346,16 @@ added `Expect: 100-continue` after signing the first request, then included
 Direct requests for the same part sent `Expect: 100-continue` in all cases.
 IDrive e2 returned HTTP 200 when the signature excluded the header and HTTP
 403 when the signature included it.
+The [IDrive e2 diagnostic](test/idrive-e2-timeout.py) reproduces the timeout
+comparison and can verify completed objects.
+
+On the same region, GeeseFS successfully updated 32 KiB of a 900 MiB object
+with `--max-merge-copy 64`. Grouping unchanged ranges reduced the number of
+server-side part copies from 179 to 14. A direct S3 range read verified the
+updated bytes after `fsync`.
+
+In a separate test, `CompleteMultipartUpload` with `If-None-Match: *`
+replaced an existing test object. A subsequent GET confirmed the replacement.
 
 It should also work with any other S3 that implements multipart uploads and
 multipart server-side copy (UploadPartCopy).
